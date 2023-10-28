@@ -17,18 +17,27 @@ public class ChatClient {
 
 	public ChatClient(String ip, int port, String user) {
 		try {
+			this.user = user;
 			Socket connection = new Socket(ip, port);
-			PrintWriter output = new PrintWriter(connection.getOutputStream(), true);
-			BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			System.out.println("Successfully joined Chat Server");
-			output.println("< " + user + " has joined the chat >");
-			startIOThreads();
+			output = new PrintWriter(connection.getOutputStream(), true);
+			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		} catch (IOException exception) {
 			System.out.println("Server does not exist");
 			System.exit(0);
 		}
 	}
 
+	public static void main(String[] args) {
+		Scanner inputScanner = new Scanner(System.in);
+		System.out.print("Please enter your username: ");
+		ChatClient client = new ChatClient("0.0.0.0", 1024, inputScanner.nextLine());
+	}
+
+	private void startChatting() {
+		System.out.println("Successfully joined Chat Server");
+		output.println("< " + user + " has joined the chat >");
+		startIOThreads();
+	}
 
 	// starts the parallel processing threads to handle output from server
 	// and input into server from console interface.
@@ -37,12 +46,6 @@ public class ChatClient {
 		inputHandler.start();
 		OutputHandler outputHandler = new OutputHandler(input, this);
 		outputHandler.start();
-	}
-
-	public static void main(String[] args) {
-		Scanner inputScanner = new Scanner(System.in);
-		System.out.print("Please enter your username: ");
-		ChatClient client = new ChatClient("0.0.0.0", 1024, inputScanner.nextLine());
 	}
 
 	public void closeClient() {

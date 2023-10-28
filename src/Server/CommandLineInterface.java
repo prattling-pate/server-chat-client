@@ -3,9 +3,8 @@ package Server;
 import java.util.Scanner;
 
 public class CommandLineInterface extends Thread {
-	private Scanner inputScanner;
-
 	private final CommandInterpreter commandInterpreter;
+	private final Scanner inputScanner;
 
 	public CommandLineInterface(ChatServer server) {
 		inputScanner = new Scanner(System.in);

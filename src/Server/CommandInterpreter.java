@@ -2,7 +2,7 @@ package Server;
 
 public class CommandInterpreter {
 
-	private ChatServer server;
+	private final ChatServer server;
 
 	public CommandInterpreter(ChatServer server) {
 		this.server = server;
@@ -10,7 +10,7 @@ public class CommandInterpreter {
 
 	public void interpretCommands(String command) {
 		if (command.matches("!quit")) {
-			server.closeServer();
+			server.stopServer();
 		}
 	}
 }
