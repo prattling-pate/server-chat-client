@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.Scanner;
 
 public class ChatClient {
@@ -13,45 +12,48 @@ public class ChatClient {
 	public ChatClient(String ip, int port, String user) throws IOException {
 		currentUser = user;
 		connection = new Socket(ip, port);
-		System.out.println("Successfully joined ChatServer");
 		PrintWriter output = new PrintWriter(connection.getOutputStream(), true);
 		BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		System.out.println("Successfully joined Chat Server");
 		output.println(currentUser + " has joined the chat");
 		InputHandler inputHandler = new InputHandler(output, user);
 		inputHandler.start();
-		OutputHandler outputHandler;
+		OutputHandler outputHandler = new OutputHandler(input);
+		outputHandler.start();
 	}
 
 	public static void main(String[] args) throws IOException {
 		Scanner inputScanner = new Scanner(System.in);
 		ChatClient client = new ChatClient("localhost", 1024, inputScanner.nextLine());
-
-	}
-
-	private String getUser() {
-		return currentUser;
-	}
-
-	public void setUser(String username) {
-		currentUser = username;
 	}
 
 }
 
 class OutputHandler extends Thread {
 
-	private BufferedReader input;
+	private final BufferedReader input;
 
 	public OutputHandler(BufferedReader input) {
 		this.input = input;
+	}
+
+	public void run() {
+		try {
+			while (true) {
+				System.out.println(input.readLine());
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
 
 class InputHandler extends Thread {
 
-	private PrintWriter output;
+	private final PrintWriter output;
 
-	private String user;
+	private final String user;
+
 	public InputHandler(PrintWriter out, String user) {
 		this.user = user;
 		output = out;
@@ -60,7 +62,7 @@ class InputHandler extends Thread {
 	public void run() {
 		Scanner inputScanner = new Scanner(System.in);
 		while (true) {
-			output.println(user +": "+inputScanner.nextLine());
+			output.println(user + ": " + inputScanner.nextLine());
 		}
 	}
 }

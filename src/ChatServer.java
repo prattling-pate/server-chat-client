@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 public class ChatServer {
 	private final ServerSocket serverSocket;
-	private final ArrayList<ClientHandler> sockets;
+	private final ArrayList<ClientHandler> clients;
 
 	public ChatServer() throws IOException {
-		sockets = new ArrayList<>();
+		clients = new ArrayList<>();
 		serverSocket = new ServerSocket(1024);
 	}
 
@@ -22,29 +22,40 @@ public class ChatServer {
 
 	// need to run handling adding new users, handling IO and console all in parallel
 	public void startServer() throws IOException {
-		// IDK if this will work rn
+		String message;
 		while (true) {
-			// waits for connection request from clients
-			sockets.add(new ClientHandler(serverSocket.accept()));
-			System.out.println(sockets.getLast().getInput().readLine());
-			sockets.getLast().start();
+			// waits for socket request from clients
+			clients.add(new ClientHandler(serverSocket.accept(), clients));
+			message = clients.getLast().getInput().readLine();
+			System.out.println(message);
+			for (ClientHandler client : clients) {
+				client.getOutput().println(message);
+			}
+			clients.getLast().start();
 		}
 	}
 }
 
 class ClientHandler extends Thread {
 
-	private final Socket connection;
+	private final Socket socket;
 
-	private PrintWriter output;
+	private ArrayList<ClientHandler> clients;
 
-	private BufferedReader input;
+	private final PrintWriter output;
 
-	public ClientHandler(Socket accept) throws IOException {
-		connection = accept;
-		output = new PrintWriter(connection.getOutputStream(),
+	private final BufferedReader input;
+
+	public ClientHandler(Socket accept, ArrayList<ClientHandler> clients) throws IOException {
+		this.clients = clients;
+		socket = accept;
+		output = new PrintWriter(socket.getOutputStream(),
 				true);
-		input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	}
+
+	public Socket getSocket() {
+		return socket;
 	}
 
 	public PrintWriter getOutput() {
@@ -65,7 +76,9 @@ class ClientHandler extends Thread {
 					break;
 				}
 				System.out.println(inputLine);
-				output.println(inputLine);
+				for (ClientHandler client : clients) {
+					client.getOutput().println(inputLine);
+				}
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
