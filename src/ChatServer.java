@@ -39,12 +39,9 @@ public class ChatServer {
 class ClientHandler extends Thread {
 
 	private final Socket socket;
-
-	private ArrayList<ClientHandler> clients;
-
 	private final PrintWriter output;
-
 	private final BufferedReader input;
+	private ArrayList<ClientHandler> clients;
 
 	public ClientHandler(Socket accept, ArrayList<ClientHandler> clients) throws IOException {
 		this.clients = clients;
