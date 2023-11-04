@@ -29,7 +29,7 @@ public class ChatClient {
 	public static void main(String[] args) {
 		Scanner inputScanner = new Scanner(System.in);
 		System.out.print("Please enter your username: ");
-		ChatClient client = new ChatClient("0.0.0.0", 1024, inputScanner.nextLine());
+		ChatClient client = new ChatClient("localhost", 1024, inputScanner.nextLine());
 	}
 
 	private void startChatting() {
@@ -41,7 +41,7 @@ public class ChatClient {
 	// starts the parallel processing threads to handle output from server
 	// and input into server from console interface.
 	private void startIOThreads() {
-		InputHandler inputHandler = new InputHandler(output, user, this);
+		InputHandler inputHandler = new InputHandler(output, user);
 		inputHandler.start();
 		OutputHandler outputHandler = new OutputHandler(input, this);
 		outputHandler.start();
@@ -90,10 +90,7 @@ class InputHandler extends Thread {
 
 	private final String user;
 
-	private final ChatClient client;
-
-	public InputHandler(PrintWriter out, String user, ChatClient client) {
-		this.client = client;
+	public InputHandler(PrintWriter out, String user) {
 		this.user = user;
 		output = out;
 	}

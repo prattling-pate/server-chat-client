@@ -121,9 +121,10 @@ class CommandInterpreter {
 	public void interpretCommands(String command) {
 		if (command.matches("!quit")) {
 			server.stopServer();
-		} else if (command.matches("!kick\\s+\\w+")) {
-
 		}
+		//else if (command.matches("!kick\\s+\\w+"))
+		//
+		//
 	}
 }
 
